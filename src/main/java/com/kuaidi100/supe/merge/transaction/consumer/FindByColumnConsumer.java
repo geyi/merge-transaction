@@ -62,13 +62,15 @@ public class FindByColumnConsumer implements SqlHandler, Consumer<List<Package>>
             ResultSet rs = ps.getResultSet();
             int j = 0;
             while (rs.next()) {
-                response(rs, list.get(j++));
+                response(rs, list.get(j));
             }
+            j++;
             while (ps.getMoreResults(Statement.KEEP_CURRENT_RESULT)) {
                 rs = ps.getResultSet();
                 while (rs.next()) {
-                    response(rs, list.get(j++));
+                    response(rs, list.get(j));
                 }
+                j++;
             }
         } catch (Exception sqlException) {
             sqlException.printStackTrace();
