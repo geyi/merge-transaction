@@ -1,9 +1,15 @@
 package com.kuaidi100.supe.merge.transaction;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.sql.Connection;
 import java.util.List;
 
 public class QueueConsumer<E> implements Runnable {
+
+    private static final Logger log = LoggerFactory.getLogger(QueueConsumer.class);
+
     private final TimeoutBlockingQueue<E> queue;
     private final Connection connection;
     private final String name;
@@ -29,6 +35,7 @@ public class QueueConsumer<E> implements Runnable {
                 if (list.isEmpty()) {
                     continue;
                 }
+                log.debug("{}|{}", name, list.size());
 
                 consumer.accept(connection, list);
             }

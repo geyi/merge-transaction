@@ -7,7 +7,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class CallbackHandler {
 
-    private static ConcurrentHashMap<Long, CompletableFuture<Object>> mapping = new ConcurrentHashMap<>(2048);
+    private static ConcurrentHashMap<Long, CompletableFuture<Object>> mapping = new ConcurrentHashMap<>(65535);
 
     public static void add(Long requestId, CompletableFuture cf) {
         mapping.putIfAbsent(requestId, cf);
