@@ -1,6 +1,7 @@
 package com.kuaidi100.supe.merge.transaction;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
@@ -103,6 +104,33 @@ public class TimeoutBlockingQueue<E> {
         }
     }
 
+    public List<E> poll() throws InterruptedException {
+        lock.lock();
+        try {
+            while (count == 0) {
+                notEmpty.await();
+            }
+
+            int min = Math.min(count, limit);
+            List<E> list = new ArrayList<>(min);            
+            for (int i = 0; i < min; i++) {
+                E item = items[takeptr];
+                if (item == null) {
+                    break;
+                }
+                list.add(item);
+                if (++takeptr == items.length) {
+                    takeptr = 0;
+                }
+                --count;
+            }
+            notFull.signal();
+            return list;
+        } finally {
+            lock.unlock();
+        }
+    }
+
     private static class Task {
         int id;
 
@@ -120,7 +148,7 @@ public class TimeoutBlockingQueue<E> {
                 try {
                     queue.put(new Task(i));
                     System.out.println("put " + i);
-                    TimeUnit.MILLISECONDS.sleep(100);
+//                    TimeUnit.MILLISECONDS.sleep(100);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -131,7 +159,7 @@ public class TimeoutBlockingQueue<E> {
                 try {
                     queue.put(new Task(i));
                     System.out.println("put " + i);
-                    TimeUnit.MILLISECONDS.sleep(100);
+//                    TimeUnit.MILLISECONDS.sleep(100);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -142,12 +170,13 @@ public class TimeoutBlockingQueue<E> {
             try {
                 int total = 0;
                 for (int i = 0; i < 100; i++) {
-                    List<Task> list = queue.take();
+                    List<Task> list = queue.poll();
                     total += list.size();
                     System.out.println("take " + list.size() + ", total " + total);
                     for (Task task : list) {
                         System.out.println(task.id);
                     }
+                    TimeUnit.MILLISECONDS.sleep(10);
                 }
             } catch (InterruptedException e) {
                 e.printStackTrace();

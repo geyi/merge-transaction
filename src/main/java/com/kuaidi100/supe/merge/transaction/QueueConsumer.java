@@ -31,7 +31,7 @@ public class QueueConsumer<E> implements Runnable {
     public void run() {
         try {
             while (true) {
-                List<E> list = queue.take();
+                List<E> list = queue.poll();
                 if (list.isEmpty()) {
                     continue;
                 }
