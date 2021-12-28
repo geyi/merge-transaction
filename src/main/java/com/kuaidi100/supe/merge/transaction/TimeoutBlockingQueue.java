@@ -1,7 +1,6 @@
 package com.kuaidi100.supe.merge.transaction;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
@@ -112,7 +111,7 @@ public class TimeoutBlockingQueue<E> {
             }
 
             int min = Math.min(count, limit);
-            List<E> list = new ArrayList<>(min);            
+            List<E> list = new ArrayList<>(min);
             for (int i = 0; i < min; i++) {
                 E item = items[takeptr];
                 if (item == null) {
