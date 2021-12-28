@@ -140,53 +140,46 @@ public class TimeoutBlockingQueue<E> {
 
     public static void main(String[] args) throws InterruptedException {
         // 测试
-        TimeoutBlockingQueue<Task> queue = new TimeoutBlockingQueue<>(new Task[100], 10, 500);
-
-        Thread putThread = new Thread(() -> {
-            for (int i = 0; i < 100; i++) {
-                try {
-                    queue.put(new Task(i));
-                    System.out.println("put " + i);
-//                    TimeUnit.MILLISECONDS.sleep(100);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
+        TimeoutBlockingQueue<Task> queue = new TimeoutBlockingQueue<>(new Task[10000], 500, 500);
+        int limit = 512;
+        Thread[] threads = new Thread[limit];
+        for (int i = 0; i < limit; i++) {
+            Thread putThread = new Thread(() -> {
+                for (int j = 0; j < 1000; j++) {
+                    try {
+                        queue.put(new Task(j));
+                        System.out.println("put " + j);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                 }
-            }
-        });
-        Thread putThread2 = new Thread(() -> {
-            for (int i = 0; i < 100; i++) {
-                try {
-                    queue.put(new Task(i));
-                    System.out.println("put " + i);
-//                    TimeUnit.MILLISECONDS.sleep(100);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
+            });
+            threads[i] = putThread;
+        }
 
         Thread takeThread = new Thread(() -> {
             try {
                 int total = 0;
-                for (int i = 0; i < 100; i++) {
+                while (true) {
                     List<Task> list = queue.poll();
                     total += list.size();
                     System.out.println("take " + list.size() + ", total " + total);
                     for (Task task : list) {
-                        System.out.println(task.id);
+                        TimeUnit.MILLISECONDS.sleep(1);
                     }
-                    TimeUnit.MILLISECONDS.sleep(10);
                 }
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         });
 
-        putThread.start();
-        putThread2.start();
         takeThread.start();
-        putThread.join();
-        putThread2.join();
+        for (Thread thread : threads) {
+            thread.start();
+        }
+        for (Thread thread : threads) {
+            thread.join();
+        }
         takeThread.join();
     }
 
