@@ -1,5 +1,6 @@
 package com.kuaidi100.supe.merge.transaction.proxy;
 
+import com.alibaba.fastjson.JSON;
 import com.kuaidi100.supe.merge.transaction.Constant;
 import com.kuaidi100.supe.merge.transaction.Consumer;
 import com.kuaidi100.supe.merge.transaction.SqlHandler;
@@ -68,10 +69,21 @@ public class ProxyFactory {
 
             CompletableFuture<Object> completableFuture = new CompletableFuture<>();
             CallbackHandler.add(requestId, completableFuture);
+            /*CompletableFuture cf = CallbackHandler.add(requestId, completableFuture);
+            if (cf != null) {
+                log.debug("cf is not null");
+            }*/
+
+            log.debug("req pkg,{},{},{}", requestId, methodName, JSON.toJSONString(args));
 
             SqlDispatcher.getInstance().get(String.format(Constant.QUEUE_NAME, serviceName, methodName))
                     .put(new Package(header, body));
 
+            /*Object o = completableFuture.get(5, TimeUnit.SECONDS);
+            if (o == null) {
+                log.debug("o is null,{},{}", requestId, methodName, JSON.toJSONString(args));
+            }
+            return o;*/
             return completableFuture.get();
         });
     }

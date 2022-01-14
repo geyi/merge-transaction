@@ -61,17 +61,23 @@ public class FindByColumnConsumer implements SqlHandler, Consumer<List<Package>>
             ps.execute();
             ResultSet rs = ps.getResultSet();
             int j = 0;
+            List<Package> removeList = new ArrayList<>(list.size());
             while (rs.next()) {
-                response(rs, list.remove(j));
+                Package pkg = list.get(j);
+                removeList.add(pkg);
+                response(rs, pkg);
             }
             j++;
             while (ps.getMoreResults(Statement.KEEP_CURRENT_RESULT)) {
                 rs = ps.getResultSet();
                 while (rs.next()) {
-                    response(rs, list.remove(j));
+                    Package pkg = list.get(j);
+                    removeList.add(pkg);
+                    response(rs, list.get(j));
                 }
                 j++;
             }
+            list.removeAll(removeList);
             if (!list.isEmpty()) {
                 for (Package pkg : list) {
                     sendResp(null, pkg);

@@ -29,8 +29,8 @@ public class QueueConsumer<E> implements Runnable {
 
     @Override
     public void run() {
-        try {
-            while (true) {
+        while (true) {
+            try {
                 List<E> list = queue.take();
                 if (list.isEmpty()) {
                     continue;
@@ -38,9 +38,9 @@ public class QueueConsumer<E> implements Runnable {
                 log.debug("{}|{}", name, list.size());
 
                 consumer.accept(connection, list);
+            } catch (Throwable e) {
+                e.printStackTrace();
             }
-        } catch (InterruptedException e) {
-            e.printStackTrace();
         }
     }
 }

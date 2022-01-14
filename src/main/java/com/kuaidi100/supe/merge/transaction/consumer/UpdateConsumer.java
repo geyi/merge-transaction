@@ -18,6 +18,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
@@ -89,7 +90,7 @@ public class UpdateConsumer implements SqlHandler, Consumer<List<Package>> {
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
-                CommonUtils.retry(connection, list);
+                CommonUtils.retry(connection, Arrays.asList(pkg));
             }
             pkg.getBody().setResponse(count);
             CallbackHandler.run(pkg);
